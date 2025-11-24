@@ -7,7 +7,7 @@ import { CreateForm } from "@/components/form/form"
 
 export const Home = () => {
 
-  const { data, isLoading, isError } = useGetUserList()
+  const { data, isLoading, } = useGetUserList()
 
 
   return (
