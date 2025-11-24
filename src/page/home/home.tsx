@@ -2,7 +2,7 @@ import { CardLoading } from "@/components/ui/card/card-loading"
 import { useGetUserList } from "./service/query/useGetUserList"
 import { Card } from "@/components/ui/card/card"
 import { BackDrop } from "@/components/back-droup/back-drop"
-import { Form } from "@/components/form/form"
+import { CreateForm } from "@/components/form/form"
 
 
 export const Home = () => {
@@ -13,7 +13,7 @@ export const Home = () => {
   return (
 
     <div className="container">
-      <Form/>
+      <CreateForm/>
       {isLoading ?
         <>
           <BackDrop />
