@@ -1,6 +1,6 @@
-import { CardLoading } from "@/components/ui/card/card-loading"
+import { CardLoading } from "@/components/card/card-loading"
 import { useGetUserList } from "./service/query/useGetUserList"
-import { Card } from "@/components/ui/card/card"
+import { Card } from "@/components/card/card"
 import { BackDrop } from "@/components/back-droup/back-drop"
 import { CreateForm } from "@/components/form/form"
 

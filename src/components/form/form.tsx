@@ -21,6 +21,7 @@ import { useCreateUser } from "@/page/home/service/mutation/useCreateUser"
 import { Spinner } from "../ui/spinner"
 
 import { useQueryClient } from "@tanstack/react-query"
+import { useUpdateUser } from "@/page/home/service/mutation/useUpdateUser"
 
 
 const formSchema = z.object({
@@ -29,9 +30,18 @@ const formSchema = z.object({
     username: z.string().min(2).max(50),
 })
 
-export const CreateForm = () => {
+
+interface DefaultValu {
+    name?:string,
+    email?:string,
+    username?:string,
+    id?:number
+}
+
+export const CreateForm = (defaultValue:DefaultValu) => {
     const [open, setOpen] = React.useState(false)
     const {mutate,isPending}=useCreateUser()
+    const {mutate:update,isPending:updateLoading}=useUpdateUser(defaultValue?.id as number)
 
     const client = useQueryClient()
 
@@ -41,10 +51,34 @@ export const CreateForm = () => {
             name: "",
             email: "",
             username: "",
+            ...defaultValue
         },
     })
 
     const onSubmit =(data:z.infer<typeof formSchema>)=>{
+        if(defaultValue?.id){
+            update(data,{
+                onSuccess:()=>{
+                    client.setQueriesData({queryKey:["user_list"]},
+                        (oldData:DefaultValu[])=>{
+
+                            const result = oldData.map((item)=>item.id ===defaultValue.id
+                             ? {...data, id:defaultValue.id}
+                             : item)
+                            return  result
+
+                        }
+                    )
+                    form.reset()
+                    setOpen(false)
+                },
+                onError:(error)=>{
+                    form.setError('username',{message:error.message})
+                }
+            })
+
+        }else{
+
             const newUser = { id: Date.now().toString(), ...data }
             mutate(newUser,{
                 onSuccess:()=>{
@@ -56,12 +90,14 @@ export const CreateForm = () => {
                     form.setError('username',{message:error.message})
                 }
             })
+        }
     }
 
     return (
         <>
-            <Button className="mt-5 cursor-pointer" onClick={() => setOpen(true)}>
-                Create
+            <Button className="mt-5 cursor-pointer bg-blue-600" onClick={() => setOpen(true)}>
+                {defaultValue.id ? "Update" :"Create"}
+                
             </Button>
             <Dialog onOpenChange={(res) => setOpen(res)} open={open}>
                 <DialogContent>
@@ -109,9 +145,11 @@ export const CreateForm = () => {
                                     </FormItem>
                                 )}
                             />
-                            <Button className="w-full" type="submit">
-                                {isPending? <Spinner/> :""}
-                                Submit</Button>
+                            <Button className="w-full bg-green-500" type="submit">
+                                {isPending || updateLoading? <Spinner /> :""}
+                                {defaultValue.id ? "Update": "Submit"}
+                                
+                                </Button>
                         </form>
                     </Form>
                 </DialogContent>
